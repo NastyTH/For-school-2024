@@ -1,0 +1,79 @@
+---
+title: "Neonatal"
+author: "Lev Kravchuck"
+date: "14 12 2021"
+output: html_document
+---
+
+```{r setup}
+
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+**Write the code below to accomplish the following tasks:**
+
+* Convert `iris` data.frame into tibble and save this data into `iris_tbl` object.
+
+```{r}
+iris_tbl <- iris #read_csv("Data/data.csv", col_types = "nn")
+iris_tbl
+```
+
+* How many observations and how many columns are in this dataset? Write your answer below:
+
+150 entries and 5 columns
+
+
+* filter out observations where `Sepal.Width` greater than 2.9
+
+```{r}
+iris_tbl %>% 
+  filter(Sepal.Width > 2.9) -> filtred_iris
+filtred_iris
+```
+
+* filter out observations of `setosa` species and `Sepal.Length` greater than 4.9 and less then 5.2
+
+```{r}
+iris_tbl %>% 
+  filter(Species == "setosa", Sepal.Length > 4.9 & Sepal.Length < 5.2) -> filtred_setosa
+filtred_setosa
+```
+
+* filter out `setosa` and `virginica` species, select `Sepal.Length` and `Sepal.Width` columns and sort by `Sepal.Length` column in descending order.
+
+```{r}
+iris_tbl %>% 
+  filter(Species != "versicolor") %>% 
+  select(Sepal.Length, Sepal.Width) %>% 
+  arrange(desc(Sepal.Length))-> iris_2
+```
+
+
+* calculate mean and sem (standard error of the mean) for `Sepal.Length` variable
+for each species of iris. 
+
+```{r}
+iris_tbl %>%
+  group_by(Species) %>%
+  summarise(MEAN = mean(Sepal.Length), 
+            SEM = sd(Sepal.Length) / sqrt(length(Sepal.Length))) -> results
+results
+```
+
+* use `ggplot2` package to plot means and sems from the previous step and make a bar plot.
+
+```{r}
+iris_tbl %>%
+  group_by(Species) %>%
+  summarise(mean = mean(Sepal.Length), 
+            sem = sd(Sepal.Length) / sqrt(length(Sepal.Length))) %>% 
+  ggplot(aes(Species, mean)) +
+  geom_col(width = 0.4, aes(fill  = Species)) + 
+  scale_fill_hue(c = 40) +
+  theme_bw() + 
+  geom_errorbar(aes(ymax = mean + sem, ymin = mean - sem), width = 0.1)
+```
